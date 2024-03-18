@@ -2,12 +2,12 @@
     ViewData["Title"] = "Новое мероприятие";
 }
 <form asp-action="AddExpense" class="text-center" method="post">
-   <div>
-       <label for="name">Name:</label>
-       <input type="text" id="name" name="name" required>
+   <div class="mb-3">
+       <label class="form-label" for="name">Имя</label>
+       <input class="form-control" type="text" id="name" name="name" required>
    </div>
    <div>
-       <button type="submit">Создать мероприятие</button>
+       <button class="btn btn-outline-primary" type="submit">Создать мероприятие</button>
    </div>
 </form>
 

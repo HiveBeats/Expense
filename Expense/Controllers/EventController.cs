@@ -46,11 +46,39 @@ public class EventController: Controller
     [HttpGet("/event/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var @event = await _db.Events
+        var @event = await GetEvent(id, true);
+        return View(_mapper.Map<EventViewModel>(@event));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddAttendee(Guid id, string name)
+    {
+        var @event = await GetEvent(id);
+        @event.AddAttendee(name);
+        await _db.SaveChangesAsync();
+        return Redirect("/event/" + @event.Id);;
+    }
+
+    private async Task<Event> GetEvent(Guid id, bool notracking = false)
+    {
+        var query = _db.Events.AsQueryable();
+        if (notracking)
+        {
+            query = query.AsNoTracking();
+        }
+        
+        return await query
             .Include(x => x.Attendees)
             .ThenInclude(x => x.Expenses)
             .SingleAsync(x => x.Id == id);
+    }
 
-        return View(_mapper.Map<EventViewModel>(@event));
+    [HttpPost]
+    public async Task<IActionResult> AddAttendeeExpense(Guid eventId, Guid attendeeId, string name, decimal amount)
+    {
+        var @event = await GetEvent(eventId);
+        @event.AddAttendeeExpense(attendeeId, name, amount);
+        await _db.SaveChangesAsync();
+        return Redirect("/event/" + @event.Id);;
     }
 }
