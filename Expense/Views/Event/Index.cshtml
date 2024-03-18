@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "Новое мероприятие";
+}
+<form asp-action="AddExpense" class="text-center" method="post">
+   <div>
+       <label for="name">Name:</label>
+       <input type="text" id="name" name="name" required>
+   </div>
+   <div>
+       <button type="submit">Создать мероприятие</button>
+   </div>
+</form>
+
+
