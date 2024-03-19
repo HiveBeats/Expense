@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Expense.Domain.Model;
 using Expense.Infrastructure;
 using Expense.Models;
@@ -40,7 +39,6 @@ public class EventController: Controller
 
         return BadRequest();
     }
-    
 
     // GET: /event/{id}
     [HttpGet("/event/{id:guid}")]
@@ -58,7 +56,24 @@ public class EventController: Controller
         await _db.SaveChangesAsync();
         return Redirect("/event/" + @event.Id);;
     }
-
+    
+    [HttpPost]
+    public async Task<IActionResult> AddAttendeeExpense(Guid eventId, Guid attendeeId, string name, decimal amount)
+    {
+        var @event = await GetEvent(eventId);
+        @event.AddAttendeeExpense(attendeeId, name, amount);
+        await _db.SaveChangesAsync();
+        return Redirect("/event/" + @event.Id);;
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAttendeePaymentsViewContent([FromQuery]Guid id, [FromQuery]Guid from, [FromQuery]Guid to)
+    {
+        var @event = await GetEvent(id, true);
+        var result = @event.GetAttendeeSummaryPayment(from, to);
+        return PartialView("AttendeePaymentTo", _mapper.Map<AttendeePaymentViewModel>(result));
+    }
+    
     private async Task<Event> GetEvent(Guid id, bool notracking = false)
     {
         var query = _db.Events.AsQueryable();
@@ -71,14 +86,5 @@ public class EventController: Controller
             .Include(x => x.Attendees)
             .ThenInclude(x => x.Expenses)
             .SingleAsync(x => x.Id == id);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddAttendeeExpense(Guid eventId, Guid attendeeId, string name, decimal amount)
-    {
-        var @event = await GetEvent(eventId);
-        @event.AddAttendeeExpense(attendeeId, name, amount);
-        await _db.SaveChangesAsync();
-        return Redirect("/event/" + @event.Id);;
     }
 }

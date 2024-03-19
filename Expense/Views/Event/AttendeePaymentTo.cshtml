@@ -1,0 +1,18 @@
+@model AttendeePaymentViewModel
+<table class="table">
+    <thead>
+        <tr>
+            <th>Должен</th>
+            <th>Кому должен</th>
+            <th>Сумма</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.From</td>
+            <td>@Model.To</td>
+            <td>@Model.Amount</td>
+        </tr>
+    </tbody>    
+</table>
+

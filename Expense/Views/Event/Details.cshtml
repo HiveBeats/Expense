@@ -15,52 +15,108 @@
 <h2>Затраты участников</h2>
 <table class="table table-light">
     <thead>
-        <tr>
-            <th>Участник</th>
-            <th>Потратил</th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>Участник</th>
+        <th>Потратил</th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var attendee in Model.Attendees)
-        {
-            <tr>
-                <td>@attendee.Name</td>
-                <td>@attendee.Expenses.Sum(x => x.Amount)</td>
-                <td>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
-                        Добавить траты
-                    </button>
-                </td>
-                <div class="modal fade" id=@("addExpenseModal" + attendee.Id) tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
+    @foreach (var attendee in Model.Attendees)
+    {
+        <tr>
+            <td>@attendee.Name</td>
+            <td>@attendee.Expenses.Sum(x => x.Amount)</td>
+            <td>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
+                    Добавить траты
+                </button>
+            </td>
+            <div class="modal fade" id=@("addExpenseModal" + attendee.Id) tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
                     <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="addExpenseModalLabel">Добавить покупку/трату</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form asp-action="AddAttendeeExpense" asp-route-eventId=@ViewData.Model.Id asp-route-attendeeId=@attendee.Id class="text-center" method="post">
-                            <div class="mb-3">
-                                <label class="form-label" for="name">Наименование</label>
-                                <input class="form-control" type="text" id="name" name="name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="amount">Сумма</label>
-                                <input class="form-control" type="number" id="amount" name="amount" required>
-                            </div>
-                            <div>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                <button type="submit" class="btn btn-primary">Добавить</button>
-                            </div>
-                        </form>
-                      </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addExpenseModalLabel">Добавить покупку/трату</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form asp-action="AddAttendeeExpense" asp-route-eventId=@ViewData.Model.Id asp-route-attendeeId=@attendee.Id class="text-center" method="post">
+                                <div class="mb-3">
+                                    <label class="form-label" for="name">Наименование</label>
+                                    <input class="form-control" type="text" id="name" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="amount">Сумма</label>
+                                    <input class="form-control" type="number" id="amount" name="amount" required>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="submit" class="btn btn-primary">Добавить</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                  </div>
                 </div>
-            </tr>
-        }
+            </div>
+        </tr>
+    }
     </tbody>
 </table>
+
+<h2>Взаиморассчеты участников</h2>
+<div class="row mb-3">
+    <div class="col">
+        <select id="fromPayment" class="form-select" aria-label="Выберите от кого">
+            <option selected>Выберите от кого</option>
+            @foreach (var attendee in Model.Attendees)
+            {
+                <option value=@attendee.Id>@attendee.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col">
+        <select id="toPayment" class="form-select" aria-label="Выберите кому">
+            <option selected>Выберите кому</option>
+            @foreach (var attendee in Model.Attendees)
+            {
+                <option value=@attendee.Id>@attendee.Name</option>
+            }
+        </select>
+    </div>
+</div>
+<div class="mb-3">
+    <button id="loadAttendeePayment" class="btn btn-outline-primary">Показать</button>
+</div>
+<div id="contentContainer">
+    
+</div>
+
+@section Scripts {
+
+    <script>
+    $(document).ready(function() {
+      $("#loadAttendeePayment").click(function() {
+          const parts = window.location.href.split('/');
+          let lastSegment = parts.pop() || parts.pop();  // handle potential trailing slash
+
+        const queryParams = {
+            id: lastSegment,
+            from: $('#fromPayment').val(),
+            to: $('#toPayment').val()
+        };
+        $.ajax({
+            url: '@Url.Action("GetAttendeePaymentsViewContent")',
+            type: 'GET',
+            data: queryParams,
+            success: function(result) {
+                $('#contentContainer').html(result);
+            }
+        });
+      });
+    });
+   </script>
+}
+
+
 
 
