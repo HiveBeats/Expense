@@ -4,6 +4,7 @@ namespace Expense.Domain.Interface;
 
 public interface IEventRepository
 {
-    Task<Event> GetEvent(Guid id);
-    Task<bool> InsertEvent(Event @event);
+    Task<Event> Get(Guid id, bool notracking = false, CancellationToken ct = default);
+    Task SaveChanges(CancellationToken ct = default);
+    void Insert(Event @event);
 }

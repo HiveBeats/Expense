@@ -1,21 +1,20 @@
 using AutoMapper;
+using Expense.Domain.Interface;
 using Expense.Domain.Model;
-using Expense.Infrastructure;
 using Expense.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Expense.Controllers;
 
 public class EventController: Controller
 {
     private readonly IMapper _mapper;
-    private readonly ExpenseDbContext _db;
+    private readonly IEventRepository _repository;
 
-    public EventController(IMapper mapper, ExpenseDbContext db)
+    public EventController(IMapper mapper, IEventRepository repository)
     {
         _mapper = mapper;
-        _db = db;
+        _repository = repository;
     }
     
     // GET: /event/{id}
@@ -32,8 +31,8 @@ public class EventController: Controller
         if (!string.IsNullOrWhiteSpace(name))
         {
             var @event = new Event(name);
-            _db.Events.Add(@event);
-            await _db.SaveChangesAsync();
+            _repository.Insert(@event);
+            await _repository.SaveChanges();
             return Redirect("/event/" + @event.Id);
         }
 
@@ -44,51 +43,33 @@ public class EventController: Controller
     [HttpGet("/event/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var @event = await GetEvent(id, true);
+        var @event = await _repository.Get(id, true);
         return View(_mapper.Map<EventViewModel>(@event));
     }
 
     [HttpPost]
     public async Task<IActionResult> AddAttendee(Guid id, string name)
     {
-        var @event = await GetEvent(id);
+        var @event = await _repository.Get(id);
         @event.AddAttendee(name);
-        await _db.SaveChangesAsync();
+        await _repository.SaveChanges();
         return Redirect("/event/" + @event.Id);;
     }
     
     [HttpPost]
     public async Task<IActionResult> AddAttendeeExpense(Guid eventId, Guid attendeeId, string name, decimal amount)
     {
-        var @event = await GetEvent(eventId);
+        var @event = await _repository.Get(eventId);
         @event.AddAttendeeExpense(attendeeId, name, amount);
-        await _db.SaveChangesAsync();
+        await _repository.SaveChanges();
         return Redirect("/event/" + @event.Id);;
     }
     
     [HttpGet]
     public async Task<IActionResult> GetAttendeePaymentsViewContent([FromQuery]Guid id, [FromQuery]Guid from, [FromQuery]Guid to)
     {
-        var @event = await GetEvent(id, true);
+        var @event = await _repository.Get(id, true);
         var result = @event.GetAttendeeSummaryPayment(from, to);
         return PartialView("AttendeePaymentTo", _mapper.Map<AttendeePaymentViewModel>(result));
-    }
-    
-    private async Task<Event> GetEvent(Guid id, bool notracking = false)
-    {
-        var query = _db.Events.AsQueryable();
-        if (notracking)
-        {
-            query = query.AsNoTracking();
-        }
-
-        return await query
-            .Include(x => x.Attendees)
-                .ThenInclude(x => x.FamilyDependents)
-            .Include(x => x.Attendees)
-                .ThenInclude(x => x.FamilyOwner)
-            .Include(x => x.Attendees)
-                .ThenInclude(x => x.Expenses)
-            .SingleAsync(x => x.Id == id);
     }
 }

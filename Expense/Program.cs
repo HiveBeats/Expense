@@ -1,4 +1,5 @@
 using Expense.Infrastructure;
+using Expense.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddDbContext<ExpenseDbContext>(options => options
     .UseNpgsql(connectionString: builder.Configuration.GetConnectionString("Expense"))
     .UseLoggerFactory(LoggerFactory.Create(logBuilder => logBuilder.AddConsole())));
+builder.Services.AddEventRepository();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Expense.Infrastructure\Expense.Infrastructure.csproj" />
+      <ProjectReference Include="..\Expense.Repository\Expense.Repository.csproj" />
     </ItemGroup>
 
 </Project>
