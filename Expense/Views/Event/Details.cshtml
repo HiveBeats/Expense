@@ -18,8 +18,7 @@
     <tr>
         <th scope="col">Участник</th>
         <th scope="col">Потратил</th>
-        <th></th>
-        <th></th>
+        <th scope="col"></th>
     </tr>
     </thead>
     <tbody>
@@ -29,14 +28,15 @@
             <td>@attendee.Name</td>
             <td>@attendee.Expenses.Sum(x => x.Amount)</td>
             <td>
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
-                    Добавить траты
+                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
+                    <span class="bi bi-bag-plus-fill text-warning"></span> Расходы
                 </button>
-            </td>
-            <td>
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target=@("#groupFamilyModal" + attendee.Id)>
-                    Глава семьи
-                </button>
+                @if (!attendee.InFamily)
+                {
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target=@("#groupFamilyModal" + attendee.Id)>
+                        <span class="bi bi-diagram-3 text-warning"></span> Семья
+                    </button>
+                }
             </td>
             <div class="modal fade" id=@("addExpenseModal" + attendee.Id) tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
