@@ -25,6 +25,10 @@ public class Attendee
         get { return _expenses; } 
         private set { _expenses = value.ToList(); }
     }
+    
+    public Attendee? FamilyOwner { get; set; }
+    public Guid? FamilyOwnerId { get; set; }
+    public IEnumerable<Attendee> FamilyDependents { get; set; }
 
     public void AddExpense(string name, decimal amount)
     {
@@ -35,5 +39,10 @@ public class Attendee
     {
         var expense = Expenses.Single(x => x.Id == id);
         _expenses.Remove(expense);
+    }
+
+    public IReadOnlyList<Expense> GetFamilyExpenses()
+    {
+        return Expenses.Union(FamilyDependents.SelectMany(x => x.Expenses)).ToList();
     }
 }

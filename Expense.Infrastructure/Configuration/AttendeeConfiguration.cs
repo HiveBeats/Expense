@@ -16,6 +16,11 @@ public class AttendeeConfiguration:IEntityTypeConfiguration<Attendee>
         builder.Property(m => m.Name)
             .HasMaxLength(128);
 
+        builder.HasOne<Attendee>(x => x.FamilyOwner)
+            .WithMany(x => x.FamilyDependents)
+            .HasForeignKey(e => e.FamilyOwnerId)
+            .IsRequired(false);
+        
         builder.HasMany(x => x.Expenses)
             .WithOne(x => x.Attendee);
     }

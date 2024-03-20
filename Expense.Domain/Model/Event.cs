@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace Expense.Domain.Model;
 
 public class Event
@@ -41,15 +43,36 @@ public class Event
         attendee.RemoveExpense(expenseId);
     }
 
+    public void JoinFamilyAttendees(Guid ownerId, IEnumerable<Guid> dependantIds)
+    {
+        var owner = Attendees.Single(x => x.Id == ownerId);
+        var dependants = Attendees.Where(x => dependantIds.Contains(x.Id));
+
+        if (owner.FamilyOwner is not null)
+        {
+            throw new ConstraintException("Family owner can't be inside another family");
+        }
+
+        if (dependants.Any(x => x.FamilyOwner is not null))
+        {
+            throw new ConstraintException(
+                $"Those guys already inside other family: {string.Join(", ", dependants.Where(x => x.FamilyOwner != null).Select(x => x.Name))}");
+        }
+        
+        owner.FamilyDependents = dependants;
+        foreach (var dependant in dependants)
+        {
+            dependant.FamilyOwner = owner;
+        }
+    }
+
     public AttendeePayment GetAttendeeSummaryPayment(Guid fromId, Guid toId)
     {
-        //todo: функционал сджоинить двух attendee в одного при вычислениях (наприм. парочка рассчитывается из одного кошелька)
-        
         var from = Attendees.Single(x => x.Id == fromId);
         var to = Attendees.Single(x => x.Id == toId);
 
-        var equalPaymentFrom = from.Expenses.Sum(x => x.Amount) / Attendees.Count();
-        var equalPaymentTo = to.Expenses.Sum(x => x.Amount) / Attendees.Count();
+        var equalPaymentFrom = from.GetFamilyExpenses().Sum(x => x.Amount) / Attendees.Count();
+        var equalPaymentTo = to.GetFamilyExpenses().Sum(x => x.Amount) / Attendees.Count();
 
         return new AttendeePayment(from, to, equalPaymentTo - equalPaymentFrom);
     }

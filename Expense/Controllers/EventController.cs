@@ -81,10 +81,14 @@ public class EventController: Controller
         {
             query = query.AsNoTracking();
         }
-        
+
         return await query
             .Include(x => x.Attendees)
-            .ThenInclude(x => x.Expenses)
+                .ThenInclude(x => x.FamilyDependents)
+            .Include(x => x.Attendees)
+                .ThenInclude(x => x.FamilyOwner)
+            .Include(x => x.Attendees)
+                .ThenInclude(x => x.Expenses)
             .SingleAsync(x => x.Id == id);
     }
 }
