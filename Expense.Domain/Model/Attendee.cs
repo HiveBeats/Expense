@@ -17,9 +17,9 @@ public class Attendee
     }
     
     public Guid Id { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     //navigation property
-    public Event Event { get; private set; }
+    public Event Event { get; private set; } = default!;
     public IEnumerable<Expense> Expenses
     {
         get { return _expenses; } 
@@ -28,7 +28,7 @@ public class Attendee
     
     public Attendee? FamilyOwner { get; set; }
     public Guid? FamilyOwnerId { get; set; }
-    public IEnumerable<Attendee> FamilyDependents { get; set; }
+    public IEnumerable<Attendee> FamilyDependents { get; set; } = default!;
 
     public void AddExpense(string name, decimal amount)
     {

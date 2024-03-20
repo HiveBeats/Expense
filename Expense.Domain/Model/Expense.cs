@@ -19,8 +19,8 @@ public class Expense
     }
     
     public Guid Id { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public decimal Amount { get; private set; }
     //navigation property
-    public Attendee Attendee { get; private set; }
+    public Attendee Attendee { get; private set; } = default!;
 }

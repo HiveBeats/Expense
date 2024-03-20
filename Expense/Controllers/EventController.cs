@@ -53,7 +53,7 @@ public class EventController: Controller
         var @event = await _repository.Get(id);
         @event.AddAttendee(name);
         await _repository.SaveChanges();
-        return Redirect("/event/" + @event.Id);;
+        return Redirect("/event/" + @event.Id);
     }
     
     [HttpPost]
@@ -62,7 +62,7 @@ public class EventController: Controller
         var @event = await _repository.Get(eventId);
         @event.AddAttendeeExpense(attendeeId, name, amount);
         await _repository.SaveChanges();
-        return Redirect("/event/" + @event.Id);;
+        return Redirect("/event/" + @event.Id);
     }
     
     [HttpGet]
