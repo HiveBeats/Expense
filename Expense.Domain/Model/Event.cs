@@ -46,7 +46,7 @@ public class Event
     public void JoinFamilyAttendees(Guid ownerId, IEnumerable<Guid> dependantIds)
     {
         var owner = Attendees.Single(x => x.Id == ownerId);
-        var dependants = Attendees.Where(x => dependantIds.Contains(x.Id));
+        var dependants = Attendees.Where(x => dependantIds.Contains(x.Id)).ToList();
 
         if (owner.FamilyOwner is not null)
         {
@@ -68,6 +68,7 @@ public class Event
 
     public AttendeePayment GetAttendeeSummaryPayment(Guid fromId, Guid toId)
     {
+        //todo: ошибка здесь?
         var from = Attendees.Single(x => x.Id == fromId);
         var to = Attendees.Single(x => x.Id == toId);
 

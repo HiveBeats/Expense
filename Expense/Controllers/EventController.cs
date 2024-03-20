@@ -65,6 +65,15 @@ public class EventController: Controller
         return Redirect("/event/" + @event.Id);
     }
     
+    [HttpPost]
+    public async Task<IActionResult> JoinFamilyAttendees(Guid eventId, Guid attendeeId, IEnumerable<Guid> dependantIds)
+    {
+        var @event = await _repository.Get(eventId);
+        @event.JoinFamilyAttendees(attendeeId, dependantIds);
+        await _repository.SaveChanges();
+        return Redirect("/event/" + @event.Id);
+    }
+    
     [HttpGet]
     public async Task<IActionResult> GetAttendeePaymentsViewContent([FromQuery]Guid id, [FromQuery]Guid from, [FromQuery]Guid to)
     {

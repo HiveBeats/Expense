@@ -16,8 +16,9 @@
 <table class="table table-light">
     <thead>
     <tr>
-        <th>Участник</th>
-        <th>Потратил</th>
+        <th scope="col">Участник</th>
+        <th scope="col">Потратил</th>
+        <th></th>
         <th></th>
     </tr>
     </thead>
@@ -30,6 +31,11 @@
             <td>
                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
                     Добавить траты
+                </button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target=@("#groupFamilyModal" + attendee.Id)>
+                    Глава семьи
                 </button>
             </td>
             <div class="modal fade" id=@("addExpenseModal" + attendee.Id) tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
@@ -49,6 +55,33 @@
                                     <label class="form-label" for="amount">Сумма</label>
                                     <input class="form-control" type="number" id="amount" name="amount" required>
                                 </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="submit" class="btn btn-primary">Добавить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id=@("groupFamilyModal" + attendee.Id) tabindex="-1" aria-labelledby="groupFamilyModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="groupFamilyModalLabel">Выберите членов семьи для @attendee.Name</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form asp-action="JoinFamilyAttendees" asp-route-eventId=@ViewData.Model.Id asp-route-attendeeId=@attendee.Id class="text-center" method="post">
+                                @foreach (var item in Model.Attendees.Where(x => x.Id != attendee.Id))
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dependantIds" value="@item.Id" id="item-@item.Id">
+                                        <label class="form-check-label" for="item-@item.Id">
+                                            @item.Name
+                                        </label>
+                                    </div>
+                                }
                                 <div>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                                     <button type="submit" class="btn btn-primary">Добавить</button>
