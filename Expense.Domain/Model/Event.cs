@@ -77,4 +77,13 @@ public class Event
 
         return new AttendeePayment(from, to, equalPaymentTo - equalPaymentFrom);
     }
+    
+    public IReadOnlyCollection<AttendeePayment> GetAttendeeSummaryPayments(Guid fromId)
+    {
+        var fromAttendee = Attendees.Single(x => x.Id == fromId);
+        var attendeesToPay = Attendees.Except(fromAttendee.FamilyDependents)
+            .Where(x => x != fromAttendee && x.FamilyOwner == null);
+        
+        return attendeesToPay.Select(x => GetAttendeeSummaryPayment(fromId, x.Id)).ToList();
+    }
 }

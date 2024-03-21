@@ -78,7 +78,16 @@ public class EventController: Controller
     public async Task<IActionResult> GetAttendeePaymentsViewContent([FromQuery]Guid id, [FromQuery]Guid from, [FromQuery]Guid to)
     {
         var @event = await _repository.Get(id, true);
-        var result = @event.GetAttendeeSummaryPayment(from, to);
-        return PartialView("AttendeePaymentTo", _mapper.Map<AttendeePaymentViewModel>(result));
+        var result = new List<AttendeePayment>();
+        if (to != Guid.Empty)
+        {
+            result.Add(@event.GetAttendeeSummaryPayment(from, to));
+        }
+        else
+        {
+            result.AddRange(@event.GetAttendeeSummaryPayments(from));
+        }
+        
+        return PartialView("AttendeePaymentTo", result.Select(x => _mapper.Map<AttendeePaymentViewModel>(x)).ToList());
     }
 }

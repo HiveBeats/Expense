@@ -1,4 +1,4 @@
-@model AttendeePaymentViewModel
+@model IEnumerable<AttendeePaymentViewModel>
 <table class="table">
     <thead>
         <tr>
@@ -8,11 +8,14 @@
         </tr>
     </thead>
     <tbody>
+    @foreach (var payment in Model)
+    {
         <tr>
-            <td>@Model.From</td>
-            <td>@Model.To</td>
-            <td>@Model.Amount</td>
+            <td>@payment.From</td>
+            <td>@payment.To</td>
+            <td>@Math.Round(payment.Amount, 2)</td>
         </tr>
+    }
     </tbody>    
 </table>
 

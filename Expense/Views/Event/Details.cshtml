@@ -28,12 +28,12 @@
             <td>@attendee.Name</td>
             <td>@attendee.Expenses.Sum(x => x.Amount)</td>
             <td>
-                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
-                    <span class="bi bi-bag-plus-fill text-warning"></span> Расходы
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target=@("#addExpenseModal" + attendee.Id)>
+                    <span class="bi bi-bag-plus text-warning"></span> Расходы
                 </button>
                 @if (!attendee.InFamily)
                 {
-                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target=@("#groupFamilyModal" + attendee.Id)>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target=@("#groupFamilyModal" + attendee.Id)>
                         <span class="bi bi-diagram-3 text-warning"></span> Семья
                     </button>
                 }
@@ -73,7 +73,7 @@
                         </div>
                         <div class="modal-body">
                             <form asp-action="JoinFamilyAttendees" asp-route-eventId=@ViewData.Model.Id asp-route-attendeeId=@attendee.Id class="text-center" method="post">
-                                @foreach (var item in Model.Attendees.Where(x => x.Id != attendee.Id))
+                                @foreach (var item in Model.Attendees.Where(x => x.Id != attendee.Id && !x.InFamily))
                                 {
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="dependantIds" value="@item.Id" id="item-@item.Id">
